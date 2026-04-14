@@ -7,14 +7,14 @@ public class Restaurantes{
   private String cidade;
   private int capacidade;
   private double avaliacao;
-  private String tiposCozinha;
+  private String tiposCozinha[];
   private int faixaPreco;
   private Hora horarioAbertura;
   private Hora horarioFechamento;
   private Data dataAbertura;
   private boolean aberto;
   //metodo construtor
-  public Restaurantes(int id, String nome, String cidade, int capacidade, double avaliacao, String tiposCozinha, int faixaPreco, Hora horarioAbertura, Hora horarioFechamento, Data dataAbertura, boolean aberto){
+  public Restaurantes(int id, String nome, String cidade, int capacidade, double avaliacao, String tiposCozinha[], int faixaPreco, Hora horarioAbertura, Hora horarioFechamento, Data dataAbertura, boolean aberto){
       this id = id;
       this.nome = nome;
       this.cidade = cidade;
@@ -32,7 +32,7 @@ public class Restaurantes{
   String getCidade(){return this.cidade;}
   int getCapacidade(){return this.capacidade;}//fzr set
   double getAvaliacao(){return this.avaliacao;}//fzr set
-  String getTiposCozinha(){return this.tiposCozinha;}//fzr set
+  String getTiposCozinha[](){return this.tiposCozinha;}//fzr set
   int getFaixaPreco(){return this.faixaPreco;}//fzr set
   Hora getHorarioAbertura(){return this.horarioAbertura;}//fzr set
   Hora getHorarioFechamento(){return this.horarioFechamento;}//fzr set
@@ -49,14 +49,33 @@ public class Restaurantes{
         this.avaliacao = avaliacao;
       }
   }
-  void setTiposCozinha(String tiposCozinha){
+  void setTiposCozinha(String tiposCozinha[]){
     this.tiposCozinha = tiposCozinha;
   }
-  void setFaixaPreco(String faixaPreco){
-      if(faixaPreco.length > 4){
+  void setFaixaPreco(int faixaPreco){
+      if(faixaPreco.length() > 4 || faixaPreco.length() < 1){
         System.out.println("erroFaixaPreco");
       }else{
-        this.faixaPreco = Integer.parseInt(faixaPreco);
+        this.faixaPreco = faixaPreco;
       }
   }
+}
+public void setHorarioAbertura(Hora horarioAbertura){
+	this.horarioAbertura = horarioAbertura;
+}
+public void setHorarioFechamento(Hora horarioFechamento){
+	this.horarioFechado = horariFechamento;
+}
+public void setAberto(boolean aberto){
+	this.aberto = aberto;
+}
+
+public static Restaurante parseRestaurante(String s){
+	Scanner sc = new Scanner(s);
+
+	sc.useDelimiter(",");
+
+	while(sc.hasNextLine()){
+		setCapacidade(s);
+	}
 }
