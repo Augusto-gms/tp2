@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.Locale;
 
 public class Restaurante{
   // variáveis privadas
@@ -47,13 +48,13 @@ public class Restaurante{
     this.capacidade = capacidade;
   }
   public void setAvaliacao(double avaliacao){
-    if(avaliacao > 0 && avaliacao < 5){
+    if(avaliacao > 0.0 && avaliacao < 5.0){
       this.avaliacao = avaliacao;
     }else{
       System.out.println("erroAvaliacao");
     }
   }
-  public void setTiposCozinha(String tiposCozinha[]){
+  public void setTiposCozinha(String[] tiposCozinha){
     this.tiposCozinha = tiposCozinha;
   }
   public void setFaixaPreco(int faixaPreco){
@@ -70,22 +71,57 @@ public class Restaurante{
   }
   public static Restaurante parseRestaurante(String s){
     Scanner sc = new Scanner(s);
+    //locale para o doube ler . e nao ,
+    sc.useLocale(Locale.US);
     sc.useDelimiter(",");
-    
+
+    //lendo id,nome,cidade,capacidade,avaliacao
     int id = sc.nextInt();
     String nome = sc.next();
     String cidade = sc.next();
     int capacidade = sc.nextInt();
     double avaliacao = sc.nextDouble();
-    String tiposCozinha = sc.next();
+
+    //lendo os tipos de cozinha e colocando no array tiposCozinha
+    String tipos = sc.next();
+    int tam = 1;
+    for(int i = 0; i < tipos.length(); i++){
+      if(tipos.charAt(i) == ';')tam++;
+    }
+    Scanner tmp = new Scanner(tipos);
+    tmp.useDelimiter(";");
+    String[] tiposCozinha = new String[tam];
+    int j = 0;
+    while(j < tam)tiposCozinha[j++] = tmp.next();
+    tmp.close();
+
+    //lendo faixaPreco
     int faixaPreco = sc.nextInt();
 
-    Hora abertura = Hora.parseHora(sc.next());
-    Hora fechamento = Hora.parseHora(sc.next());
-    Data data = Data.parseData(sc.next());
+    //lendo os horarioAbertura e horarioFechamento
+    String horarios = sc.next();
+    Scanner scH = new Scanner(horarios);
+    scH.useDelimiter("-");
+    //lendo horario de abertura 
+    Hora horarioAbertura = Hora.parseHora(scH.next());
+    //lendo horairo de fechamento 
+    Hora horarioFechamento = Hora.parseHora(scH.next());
+    scH.close();
 
+    //lendo dataAbertura
+    Data dataAbertura = Data.parseData(sc.next());
+
+    //lendo aberto
     boolean aberto = sc.nextBoolean();
-    sc.close();
-    return new Restaurante(id,nome,cidade,capacidade,avaliacao,tiposCozinha,faixaPreco,abertura,fechamento,data,aberto);
+
+    //criando novo Restaurante
+    return new Restaurante(id,nome,cidade,capacidade,avaliacao,tiposCozinha,faixaPreco,horarioAbertura,horarioFechamento,dataAbertura,aberto);
+  }
+  public String formatar(){
+    String tipos = "";
+    //colocando os valores do array tiposCozinha em uma Stirng
+    for(int i = 0; i < tiposCozinha.length; i++){tipos += tiposCozinha[i];}
+    //printando string formatada 
+    return String.format("%d %s %s %d %s %d %s-%s %s %b",id,nome,cidade,capacidade,tipos,faixaPreco,horarioAbertura.formatar(),horarioFechamento.formatar(),dataAbertura.formatar(),aberto);
   }
 }
