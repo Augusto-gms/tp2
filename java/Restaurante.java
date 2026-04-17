@@ -119,9 +119,13 @@ public class Restaurante{
   }
   public String formatar(){
     String tipos = "";
+    String preco = "";
     //colocando os valores do array tiposCozinha em uma Stirng
     for(int i = 0; i < tiposCozinha.length; i++){tipos += tiposCozinha[i];}
+    for(int i = 0; i < faixaPreco; i++){
+      preco += "$";
+    }
     //printando string formatada 
-    return String.format("%d %s %s %d %s %d %s-%s %s %b",id,nome,cidade,capacidade,tipos,faixaPreco,horarioAbertura.formatar(),horarioFechamento.formatar(),dataAbertura.formatar(),aberto);
+    return String.format("%d %s %s %d %s %s %s-%s %s %b",id,nome,cidade,capacidade,tipos,preco,horarioAbertura.formatar(),horarioFechamento.formatar(),dataAbertura.formatar(),aberto);
   }
 }
