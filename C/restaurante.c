@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 //"classe" Data
 typedef struct{
@@ -78,6 +79,65 @@ void formatar_hora(Hora* horario, char* buffer){
   printf("%s\n", buffer);
 }
 //fim da "classe" Hora
+
+//inicio da "classe" restaurante
+typedef struct{
+  int id;
+  char* nome;
+  char* cidade;
+  int capacidade;
+  double avaliacao;
+  int n_tipos_cozinha;
+  char** tipos_cozinha;
+  int faixa_preco;
+  Hora* horario_abertura;
+  Hora* horario_fechamento;
+  Data* data_abertura;
+  int aberto;
+} Restaurante;
+//metodo construtor
+Restaurante* criar_restaurante(int id, char* nome, char* cidade, int capacidade, double avaliacao, int n_tipos_cozinha, char** tipos_cozinha, int faixa_preco, 
+Hora* horario_abertura, Hora* horario_fechamento, Data* data_abertura, int aberto){
+  //alocando memoria
+  Restaurante* restaurante = malloc(sizeof(Restaurante));
+  //construindo variaveis
+  restaurante->id = id;
+  restaurante->nome = nome;
+  restaurante->cidade = cidade;
+  restaurante->capacidade = capacidade;
+  restaurante->avaliacao = avaliacao;
+  restaurante->n_tipos_cozinha = n_tipos_cozinha;
+  restaurante->tipos_cozinha = tipos_cozinha;
+  restaurante->faixa_preco = faixa_preco;
+  restaurante->horario_abertura = horario_abertura;
+  restaurante->horario_fechamento = horario_fechamento;
+  restaurante->data_abertura = data_abertura;
+  restaurante->aberto = aberto;
+
+  return restaurante;
+}
+//metodos getters
+int get_id(Restaurante* restaurante){return restaurante->id;}
+char* get_nome(Restaurante* restaurante){return restaurante->nome;}
+char* get_cidade(Restaurante* restaurante){return restaurante->cidade;}
+int get_capacidade(Restaurante* restaurante){return restaurante->capacidade;}
+double get_avaliacao(Restaurante* restaurante){return restaurante->avaliacao;}
+int get_n_tipos_cozinha(Restaurante* restaurante){return restaurante->n_tipos_cozinha;}
+char** get_tipos_cozinha(Restaurante* restaurante){return restaurante->tipos_cozinha;}
+int get_faixa_preco(Restaurante* restaurante){return restaurante->faixa_preco;}
+Hora* get_horario_abertura(Restaurante* restaurante){return restaurante->horario_abertura;}
+Hora* get_horario_fechamento(Restaurante* restaurante){return restaurante->horario_fechamento;}
+Data* get_data_abertura(Restaurante* restaurante){return restaurante->data_abertura;}
+int get_aberto(Restaurante* restaurante){return restaurante->aberto;}
+
+Restaurante* parse_Restaurante(char* s){
+
+}
+void formatar_restaurante(Restaurante* r, char* buffer){
+  sprintf(buffer, "%d %s %s %d %lf %d %s %d %s %s %s %d", r->id,r->nome,r->cidade,r->capacidade,r->avaliacao,r->n_tipos_cozinha,r->tipos_cozinha,r->faixa_preco,r->horario_abertura,r->horario_fechamento,r->data_abertura,r->aberto);
+  printf("%s\n", buffer);
+}
+
 int main(){
   //testando Data
   char* entrada = "2006-07-04";
@@ -93,6 +153,14 @@ int main(){
   Hora* hora = parse_hora(entrada2);
   formatar_hora(hora, saida2);
 
+  //testando Restaurante
+  char* entrada3 = "1,Central Park Bistro,São Paulo,150,4.5,Italiana;Francesa;Contemporânea,3,08:00-23:30,2006-01-02,true";
+  char saida3[200];
+  
+  Restaurante* r(entrada3);
+  formatar_restaurante(r, saida2);
+
   free(data);
   free(hora);
+  free(r);
 }
