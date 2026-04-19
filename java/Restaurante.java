@@ -96,7 +96,8 @@ public class Restaurante{
     tmp.close();
 
     //lendo faixaPreco
-    int faixaPreco = sc.nextInt();
+    String preco = sc.next();
+    int faixaPreco = preco.length();
 
     //lendo os horarioAbertura e horarioFechamento
     String horarios = sc.next();
@@ -118,10 +119,14 @@ public class Restaurante{
     return new Restaurante(id,nome,cidade,capacidade,avaliacao,tiposCozinha,faixaPreco,horarioAbertura,horarioFechamento,dataAbertura,aberto);
   }
   public String formatar(){
-    String tipos = "";
+    String tipos = "[";
     String preco = "";
     //colocando os valores do array tiposCozinha em uma Stirng
-    for(int i = 0; i < tiposCozinha.length; i++){tipos += tiposCozinha[i];}
+    for(int i = 0; i < tiposCozinha.length; i++){
+      tipos += tiposCozinha[i];
+      tipos += ",";
+    }
+    tipos += "]";
     for(int i = 0; i < faixaPreco; i++){
       preco += "$";
     }
