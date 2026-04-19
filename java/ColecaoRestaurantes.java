@@ -31,4 +31,14 @@ public class ColecaoRestaurantes{
     colecao.lerCsv("/home/augusto/restaurantes.csv");
     return colecao;
   }
+  public Restaurante pesquisarId(int id){
+    Restaurante resp = null;
+    for(int i = 0; i < tamanho; i++){
+      if(restaurantes[i].getId() == id){
+        resp = restaurantes[i];
+        i = tamanho;
+      }
+    }
+    return resp;
+  }
 }

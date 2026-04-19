@@ -115,22 +115,24 @@ public class Restaurante{
     //lendo aberto
     boolean aberto = sc.nextBoolean();
 
+    sc.close();
     //criando novo Restaurante
     return new Restaurante(id,nome,cidade,capacidade,avaliacao,tiposCozinha,faixaPreco,horarioAbertura,horarioFechamento,dataAbertura,aberto);
   }
   public String formatar(){
-    String tipos = "[";
+    String tipos = "";
     String preco = "";
     //colocando os valores do array tiposCozinha em uma Stirng
     for(int i = 0; i < tiposCozinha.length; i++){
       tipos += tiposCozinha[i];
-      tipos += ",";
+      if(i < tiposCozinha.length - 1){
+        tipos += ',';
+      }
     }
-    tipos += "]";
     for(int i = 0; i < faixaPreco; i++){
       preco += "$";
     }
     //printando string formatada 
-    return String.format("%d %s %s %d %s %s %s-%s %s %b",id,nome,cidade,capacidade,tipos,preco,horarioAbertura.formatar(),horarioFechamento.formatar(),dataAbertura.formatar(),aberto);
+    return String.format(Locale.US, "[%d ## %s ## %s ## %d ## %.1f ## [%s] ## %s ## %s-%s ## %s ## %b]",id,nome,cidade,capacidade,avaliacao,tipos,preco,horarioAbertura.formatar(),horarioFechamento.formatar(),dataAbertura.formatar(),aberto);
   }
 }
