@@ -2,16 +2,17 @@ package ordenacao;
 import modelos.Restaurante;
 import java.io.*;
 
-public class Selecao{
+public class Insercao{
   private int comparacoes;
   private int movimentacoes;
   private long tempoExecucao;
   //construtor vazio para incializar as variaveis
-  public Selecao(){
+  public Insercao(){
     this.comparacoes = 0;
     this.movimentacoes = 0;
     this.tempoExecucao = 0;
   }
+  /*
   public void ordenar(Restaurante[] array, int n){
     //tmepo inicial de execucao
     long inicio = System.currentTimeMillis();
@@ -32,7 +33,25 @@ public class Selecao{
     long fim = System.currentTimeMillis();
     //tempo total de execucao
     this.tempoExecucao = fim - inicio;
-  }
+  }*/
+  public void ordenar(Restaurante[] array, int n){
+    long inicio = System.currentTimeMillis();
+
+		for (int i = 1; i < n; i++) {
+			Restaurante tmp = array[i];
+         int j = i - 1;
+
+         while ((j >= 0) && (compareTo(array[j], tmp) > 0)){
+            this.comparacoes++;
+            array[j + 1] = array[j];
+            this.movimentacoes++;
+            j--;
+         }
+         array[j + 1] = tmp;
+      }
+    long fim = System.currentTimeMillis();
+    this.tempoExecucao = fim - inicio;
+	  }
 
   //metodo para trocar elementos
   private void swap(Restaurante[] array, int i, int j){
@@ -49,10 +68,10 @@ public class Selecao{
   public void criarLog(){
     String matricula = "898723";
     try{
-      FileWriter w = new FileWriter(matricula + ".txt");
+      FileWriter w = new FileWriter(matricula + "_insercao.txt");
       PrintWriter p = new PrintWriter(w);
       
-      p.print(matricula + "\t" + this.comparacoes + "\t" + this.movimentacoes + "\t" + tempoExecucao + "ms\n");
+      p.print(matricula + "\t" + this.comparacoes + "\t" + this.movimentacoes + "\t" + this.tempoExecucao + "ms\n");
       
       p.close();
       w.close();
