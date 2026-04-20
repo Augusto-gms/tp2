@@ -11,7 +11,7 @@ public class ColecaoRestaurantes{
     this.tamanho = 0;
     this.restaurantes = new Restaurante[1000];
   }
-  int getTamanho(){return tamanho;}
+  public int getTamanho(){return tamanho;}
   public Restaurante[] getRestaurantes(){return restaurantes;}
   
   public void lerCsv(String path) throws Exception{
