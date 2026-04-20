@@ -1,3 +1,6 @@
+package colecoes;
+import modelos.Restaurante;
+
 import java.util.*;
 import java.io.*;
 

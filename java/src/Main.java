@@ -1,3 +1,6 @@
+import modelos.Restaurante;
+import colecoes.ColecaoRestaurantes;
+
 import java.util.*;
 
 public class Main {
