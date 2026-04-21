@@ -15,9 +15,15 @@ public class Mergesort{
   }
   public void sort(Restaurante[] array){
     this.array = array;
+    long inicio = System.currentTimeMillis();
+
     mergesort(0, array.length - 1);
+
+    long fim = System.currentTimeMillis();
+    this.tempoExecucao = fim - inicio;
   }
   public void mergesort(int esq, int dir){
+    this.comparacoes++;
     if(esq < dir){
       int meio = (esq + dir) / 2;
       mergesort(esq, meio);
@@ -50,11 +56,13 @@ public class Mergesort{
 
     //intercalacao 
     for(i = j = 0, k = esq; k <= dir; k++){
-    array[k] = (a1[i] != null && (a2[j] == null || compareTo(a1[i], a2[j]) <= 0)) ? a1[i++] : a2[j++];
+      array[k] = (a1[i] != null && (a2[j] == null || compareTo(a1[i], a2[j]) <= 0)) ? a1[i++] : a2[j++];
+      this.movimentacoes++;
     }
   }
   //compareTo
   private int compareTo(Restaurante e1, Restaurante e2){
+    this.comparacoes++;
     int resp = e1.getCidade().compareTo(e2.getCidade());
     if(resp == 0){
       resp = e1.getNome().compareTo(e2.getNome());
