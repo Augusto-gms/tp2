@@ -12,28 +12,7 @@ public class Insercao{
     this.movimentacoes = 0;
     this.tempoExecucao = 0;
   }
-  /*
-  public void ordenar(Restaurante[] array, int n){
-    //tmepo inicial de execucao
-    long inicio = System.currentTimeMillis();
-    
-    for(int i = 0; i < n-1; i++){
-      int menor = i;
-      for(int j = i+1; j < n; j++){
-        this.comparacoes++;
-        if(compareTo(array[j], array[menor]) < 0){
-          menor = j;
-        }
-      }
-      swap(array, i,menor);
-      this.movimentacoes += 3;
-    }
 
-    //tempo final de execucao
-    long fim = System.currentTimeMillis();
-    //tempo total de execucao
-    this.tempoExecucao = fim - inicio;
-  }*/
   public void ordenar(Restaurante[] array, int n){
     long inicio = System.currentTimeMillis();
 
