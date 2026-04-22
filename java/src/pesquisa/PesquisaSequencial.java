@@ -14,7 +14,7 @@ public class PesquisaSequencial{
     boolean resp = false;
     for(int i = 0; i < n; i++){
       this.comparacoes++;
-      if(array[i].getNome().equals(busca)){
+      if(compareTo(array[i], busca) == 0){
         resp = true;
         i = n;
       }
@@ -22,6 +22,11 @@ public class PesquisaSequencial{
     long fim = System.currentTimeMillis();
     this.tempoExecucao = fim - inicio;
     System.out.println(resp ? "SIM" : "NAO");
+  }
+
+  private int compareTo(Restaurante e1, String e2){
+    int resp = e1.getNome().compareTo(e2);
+    return resp;
   }
 
   public void criarLog(){

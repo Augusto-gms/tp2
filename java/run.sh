@@ -1,3 +1,3 @@
 #!/bin/bash
-javac -d bin src/modelos/*.java src/colecoes/*.java src/ordenacao/*.java src/pesquisa/*.java src/Main.java &&
-  java -cp bin Main <src/assets/pub.in
+javac -d bin src/modelos/*.java src/colecoes/*.java src/ordenacao/*.java src/pesquisa/*.java src/MainMerge.java &&
+  java -cp bin MainMerge <src/assets/pub.in

@@ -6,7 +6,7 @@ import java.io.*;
 
 public class ColecaoRestaurantes{
   private int tamanho;
-  Restaurante[] restaurantes;
+  private Restaurante[] restaurantes;
   public ColecaoRestaurantes(){
     this.tamanho = 0;
     this.restaurantes = new Restaurante[1000];
