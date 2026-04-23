@@ -34,10 +34,10 @@ void set_dia(Data* data, int dia){
   data->dia = dia;
 }
 //metodo parse
-Data* parse_data(char* s){
-  int ano, mes, dia;
-  sscanf(s, "%d-%d-%d", &ano, &mes, &dia);
-  return criar_data(ano, mes, dia);
+Data parse_data(char* s){
+  Data data_mod;
+  sscanf(s, "%d-%d-%d", &data_mod.ano, &data_mod.mes, &data_mod.dia);
+  return data_mod;
 }
 void formatar_data(Data* data, char* buffer){
   sprintf(buffer, "%02d/%02d/%04d", data->dia, data->mes, data->ano);
@@ -69,10 +69,10 @@ void set_minuto(Hora* horario, int minuto){
   horario->minuto = minuto;
 }
 //metodo parseHora
-Hora* parse_hora(char* s){
-  int hora, minuto;
-  sscanf(s, "%d:%d", &hora, &minuto);
-  return criar_hora(hora, minuto);
+Hora parse_hora(char* s){
+  Hora hora_mod;
+  sscanf(s, "%d:%d",&hora_mod.hora,&hora_mod.minuto);
+  return hora_mod;
 }
 void formatar_hora(Hora* horario, char* buffer){
   sprintf(buffer, "%02d:%02d", horario->hora, horario->minuto);
@@ -90,14 +90,14 @@ typedef struct{
   int n_tipos_cozinha;
   char** tipos_cozinha;
   int faixa_preco;
-  Hora* horario_abertura;
-  Hora* horario_fechamento;
-  Data* data_abertura;
+  Hora horario_abertura;
+  Hora horario_fechamento;
+  Data data_abertura;
   int aberto;
 } Restaurante;
 //metodo construtor
 Restaurante* criar_restaurante(int id, char* nome, char* cidade, int capacidade, double avaliacao, int n_tipos_cozinha, char** tipos_cozinha, int faixa_preco, 
-Hora* horario_abertura, Hora* horario_fechamento, Data* data_abertura, int aberto){
+Hora horario_abertura, Hora horario_fechamento, Data data_abertura, int aberto){
   //alocando memoria
   Restaurante* restaurante = malloc(sizeof(Restaurante));
   //construindo variaveis
@@ -125,13 +125,23 @@ double get_avaliacao(Restaurante* restaurante){return restaurante->avaliacao;}
 int get_n_tipos_cozinha(Restaurante* restaurante){return restaurante->n_tipos_cozinha;}
 char** get_tipos_cozinha(Restaurante* restaurante){return restaurante->tipos_cozinha;}
 int get_faixa_preco(Restaurante* restaurante){return restaurante->faixa_preco;}
-Hora* get_horario_abertura(Restaurante* restaurante){return restaurante->horario_abertura;}
-Hora* get_horario_fechamento(Restaurante* restaurante){return restaurante->horario_fechamento;}
-Data* get_data_abertura(Restaurante* restaurante){return restaurante->data_abertura;}
+Hora get_horario_abertura(Restaurante* restaurante){return restaurante->horario_abertura;}
+Hora get_horario_fechamento(Restaurante* restaurante){return restaurante->horario_fechamento;}
+Data get_data_abertura(Restaurante* restaurante){return restaurante->data_abertura;}
 int get_aberto(Restaurante* restaurante){return restaurante->aberto;}
 
 Restaurante* parse_Restaurante(char* s){
-
+	Restaurante* r = malloc(sizeof(Restaurante));
+	char* tmp_ha;
+	char* tmp_hf;
+	char* tmp_da;
+	sscanf(s, "%d,%[^,],%[^,],%d,%lf,%[^,],%d,%[^-],%s,%[^,],%d",&r->id,r->nome,r->cidade,&r->capacidade,&r->avaliacao,r->tipos_cozinha,&r->faixa_preco,tmp_ha,tmp_hf,tmp_da,&r->aberto);
+	r->horario_abertura = parse_hora(tmp_ha);
+	r->horario_fechamento = parse_hora(tmp_hf);
+	r->data_abertura = parse_data(tmp_da);
+	while(r->tipos_cozinha[r->n_tipos_cozinha] != '\0'){
+		
+	}
 }
 void formatar_restaurante(Restaurante* r, char* buffer){
   sprintf(buffer, "%d %s %s %d %lf %d %s %d %s %s %s %d", r->id,r->nome,r->cidade,r->capacidade,r->avaliacao,r->n_tipos_cozinha,r->tipos_cozinha,r->faixa_preco,r->horario_abertura,r->horario_fechamento,r->data_abertura,r->aberto);
