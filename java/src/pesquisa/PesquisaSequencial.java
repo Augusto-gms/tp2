@@ -1,6 +1,6 @@
 package pesquisa;
-import modelos.Restaurante;
 import java.io.*;
+import modelos.Restaurante;
 
 public class PesquisaSequencial{
   private int comparacoes;
@@ -10,7 +10,6 @@ public class PesquisaSequencial{
     this.tempoExecucao = 0;
   }
   public void pesquisar(Restaurante[] array, int n, String busca){
-    long inicio = System.currentTimeMillis(); 
     boolean resp = false;
     for(int i = 0; i < n; i++){
       this.comparacoes++;
@@ -19,8 +18,6 @@ public class PesquisaSequencial{
         i = n;
       }
     }
-    long fim = System.currentTimeMillis();
-    this.tempoExecucao = fim - inicio;
     System.out.println(resp ? "SIM" : "NAO");
   }
 

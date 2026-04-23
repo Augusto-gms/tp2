@@ -1,9 +1,7 @@
+import colecoes.*;
+import java.util.*;
 import modelos.*;
 import ordenacao.*;
-import pesquisa.*;
-import colecoes.*;
-
-import java.util.*;
 
 public class MainInsercao{
   public static void main(String args[]){

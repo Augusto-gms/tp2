@@ -1,6 +1,6 @@
 package ordenacao;
-import modelos.Restaurante;
 import java.io.*;
+import modelos.Restaurante;
 
 public class Mergesort{
   private int comparacoes;

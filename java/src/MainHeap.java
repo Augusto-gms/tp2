@@ -1,8 +1,6 @@
-import ordenacao.*;
 import colecoes.*;
-import modelos.*;
-import pesquisa.*;
 import java.util.*;
+import modelos.*;
 
 public class MainHeap{
   public static void main(String args[]){

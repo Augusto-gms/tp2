@@ -14,22 +14,17 @@ public class Insercao{
   }
 
   public void ordenar(Restaurante[] array, int n){
-    long inicio = System.currentTimeMillis();
-
 		for (int i = 1; i < n; i++) {
 			Restaurante tmp = array[i];
-         int j = i - 1;
-
-         while ((j >= 0) && (compareTo(array[j], tmp) > 0)){
-            this.comparacoes++;
+        int j = i - 1;
+          this.comparacoes++;
+          while ((j >= 0) && (compareTo(array[j], tmp) > 0)){
             array[j + 1] = array[j];
             this.movimentacoes++;
             j--;
-         }
-         array[j + 1] = tmp;
+          }
+        array[j + 1] = tmp;
       }
-    long fim = System.currentTimeMillis();
-    this.tempoExecucao = fim - inicio;
 	  }
 
   //metodo para trocar elementos

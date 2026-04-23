@@ -1,9 +1,6 @@
-import modelos.*;
 import colecoes.*;
-import ordenacao.*;
-import pesquisa.*;
-
 import java.util.*;
+import modelos.*;
 
 public class MainId{
   public static void main(String[] args) {

@@ -1,8 +1,7 @@
-import ordenacao.*;
 import colecoes.*;
+import java.util.*;
 import modelos.*;
 import pesquisa.*;
-import java.util.*;
 
 public class MainPesquisa{
   public static int isFim(String s){

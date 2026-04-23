@@ -1,8 +1,7 @@
 import colecoes.*;
+import java.util.*;
 import modelos.*;
 import ordenacao.*;
-import pesquisa.*;
-import java.util.*;
 
 public class MainMerge{
   public static void main(String args[]){
