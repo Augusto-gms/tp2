@@ -130,6 +130,7 @@ int get_aberto(Restaurante* restaurante){return restaurante->aberto;}
 
 Restaurante* parse_Restaurante(char* s){
 	Restaurante* r = malloc(sizeof(Restaurante));
+  r->faixa_preco = 0;
   r->aberto = 0;
   r->nome = malloc(50*sizeof(char));
   r->cidade = malloc(50*sizeof(char));
@@ -236,7 +237,7 @@ void ler_csv_colecao(Colecao_Restaurantes* c, char* path){
 //le o caminho do arquivo
 Colecao_Restaurantes* ler_csv(){
   Colecao_Restaurantes* c = criar_colecao();
-  //char* caminho = "/tmp/restaurantes.csv";
+//  char* caminho = "/tmp/restaurantes.csv";
   char* caminho = "/home/augusto/restaurantes.csv";
   ler_csv_colecao(c, caminho);
   return c;
@@ -252,6 +253,50 @@ Restaurante* pesquisarId(Colecao_Restaurantes* c,int id){
   }
   return resp;
 }
+//metodo para trocar
+void swap(Restaurante** array, int i, int j){
+  Restaurante* tmp = array[i];
+  array[i] = array[j];
+  array[j] = tmp;
+}
+
+//metodo para comparar
+int compare_to(Restaurante* e1, Restaurante* e2){
+  int resp = strcmp(e1->nome, e2->nome);
+  return resp;
+}
+
+//ordenando por slecao
+void ordenar_selecao(Restaurante** array, int n){
+  for(int i = 0; i < n; i++){
+    int menor = i;
+    for(int j = i+1; j<n; j++){
+      if(compare_to(array[j], array[menor]) < 0)
+        menor = j;
+    }
+    swap(array,i,menor);
+  }
+}
+
+//pesquisando de forma binaria
+void pesquisa_binaria(Restaurante** array, int n, char* busca){
+  int resp=0, esq=0, dir=n-1;
+
+  while(esq <= dir){
+    int meio = (esq+dir)/2;
+    int decisao = strcmp(array[meio]->nome, busca);
+    if(decisao == 0){
+      resp = 1;
+      esq = dir+1;
+    }else if(decisao < 0){
+      esq = meio+1;
+    }else{
+      dir = meio-1;
+    }
+  }
+  printf("%s", resp ? "SIM\n" : "NAO\n");
+}
+
 //fazendo a faxina no restaurante
 void liberar_restaurante(Restaurante* r){
   free(r->nome);
@@ -273,7 +318,12 @@ void liberar_colecao(Colecao_Restaurantes* c){
   free(c->restaurantes);
   free(c);
 }
-
+//metodo para controlar o loop "FIM"
+int isFim(char* s){
+  int resp = 0;
+  if(s[0] == 'F' && s[1] == 'I' && s[2] == 'M' && s[3] == '\0')resp = 1;
+  return resp;
+}
 int main(){
   //cria a colecao
   Colecao_Restaurantes* colecao = ler_csv();
@@ -282,7 +332,7 @@ int main(){
   //cria um array temporario para pesquisar os ids
   Restaurante** tmp = malloc(n*sizeof(Restaurante*));
   int id=0, i=0;
-  while(scanf("%d", &id) >= 0){
+  while(scanf("%d", &id) > 0){
     Restaurante* r = pesquisarId(colecao, id);
     if(r != NULL){
       tmp[i++] = r;
@@ -296,10 +346,20 @@ int main(){
   //printa os restaurantes correspondentes aos ids idsos
   char saida[500];
   for(int j=0; j<i; j++){
-    formatar_restaurante(array[j], saida);
+    //formatar_restaurante(array[j], saida);
+  }
+  //ordenando pelo metodo de selecao
+  ordenar_selecao(array,i);
+  for(int j=0; j<i; j++){
+    //formatar_restaurante(array[j],saida);
+  }
+  //pesquisando de forma binaria
+  char busca[40];
+  while(scanf(" %[^\n]", busca) == 1 && isFim(busca) == 0){
+    pesquisa_binaria(array,i,busca);
   }
   //chama metodo para liberar e liberar memorira de tmp e array
-  liberar_colecao(colecao);
   free(tmp);
   free(array);
+  liberar_colecao(colecao);
 }
