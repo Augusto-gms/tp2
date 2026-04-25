@@ -243,10 +243,9 @@ void ler_csv_colecao(Colecao_Restaurantes* c, char* path){
 //le o caminho do arquivo
 Colecao_Restaurantes* ler_csv(){
   Colecao_Restaurantes* c = criar_colecao();
-  //char* caminho = "/tmp/restaurantes.csv";
+  char* caminho = "/tmp/restaurantes.csv";
   
-  //teste com a caminho da minha maquina
-  char* caminho = "/home/augusto/restaurantes.csv";
+
   ler_csv_colecao(c, caminho);
   return c;
 }
@@ -271,6 +270,7 @@ void swap(Restaurante** array, int i, int j){
 //metodo para comparar
 int compare_to(Restaurante* e1, Restaurante* e2){
   int resp;
+  //comparando pela avaliacao, descomentar quando for usar quicksort
   if(e1->avaliacao < e2->avaliacao)
     resp=-1;
   else if(e1->avaliacao > e2->avaliacao)
@@ -319,7 +319,7 @@ void quicksort(Restaurante** array, int n){
   quicksort_rec(array,0,n-1);
 }
 
-//ordenando por countingsort
+//pegando a maior capacidade para usar na ordenacao
 int getMaior(Restaurante** array, int n){
   int maior = array[0]->capacidade;
 
@@ -330,19 +330,25 @@ int getMaior(Restaurante** array, int n){
   }
   return maior;
 }
+//ordenando por countingsort
 void countingsort(Restaurante** array, int n){
   int tamCount = getMaior(array,n) + 1;
   int count[tamCount];
   Restaurante* ordenado[n];
 
+  //zera o vetor de contagem 
   for(int i=0; i<tamCount; count[i]=0, i++);
 
+  //conta a quantas "capacidade" aparecem 
   for(int i=0; i<n; count[array[i]->capacidade]++, i++);
 
+  //
   for(int i=1; i<tamCount; count[i] += count[i-1], i++);
 
+  //ordenando, posicionando cada elemento na posicao correta
   for(int i = n-1; i >= 0; ordenado[count[array[i]->capacidade]-1] = array[i], count[array[i]->capacidade]--, i--){movimentacoes++;}
 
+  //copiando pro array original
   for(int i = 0; i < n; array[i] = ordenado[i], i++){movimentacoes++;}
   movimentacoes++;
 }
@@ -417,13 +423,13 @@ void manipular(Restaurante** array,int n,Colecao_Restaurantes* c){
     scanf(" %c", &op);
     if(op == 'I'){
       scanf("%d", &id);
-      //pega as informacoes do restaurante do csv
+      //pega as informacoes do restaurante do csv pleo id lido
       Restaurante* r = pesquisarId(c, id);
       //empilha
       if(r!=NULL)empilhar(p,r);
     }else if(op == 'R'){
       Restaurante* rm = desempilhar(p);
-      printf("(R) %s\n", rm->nome);
+      printf("(R)%s\n", rm->nome);
     }
     k++;
   }
@@ -458,7 +464,7 @@ void liberar_memoria(Colecao_Restaurantes* c) {
 void criar_log(double tempoExecucao){
   FILE* log = fopen("898723_countingsort.txt", "w");
   if(log != NULL){
-    fprintf(log, "898723\t%d\t%d\t%lf\n", comparacoes, movimentacoes,tempoExecucao);
+    fprintf(log, "898723\t%d\t%d\t%lf\n", comparacoes,movimentacoes,tempoExecucao);
     fclose(log);
   }
 }
@@ -502,11 +508,8 @@ int main(){
   for(int j = 0; j < i; j++){
     array[j] = tmp[j];
   }
-
-
   
   //printa os restaurantes correspondentes aos ids lidsos
-  
   //exibir(array,i);
  
   //chama a pilha e inicia a manipulacao da pilha, inserindo e removendo restaurantes
@@ -526,6 +529,7 @@ int main(){
   /*
   //pesquisando de forma binaria
   char* busca = malloc(100*sizeof(char));
+  ordenar_selecao(array,i);
   inicio = clock();
   //lendo ate \n \r. programa so rodava 100% no verde com \r no final
   comparacoes=0;
@@ -556,7 +560,7 @@ int main(){
 
   tempoExecucao = ((fim-inicio)/(double)CLOCKS_PER_SEC);
   //chama o metodo que cria o arquivo log com  as informacoes
-  criar_log(tempoExecucao);
+  //criar_log(tempoExecucao);
 
   //chama metodo para liberar memorira, e liberar memorira de tmp e array
   free(tmp);
