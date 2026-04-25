@@ -371,6 +371,68 @@ void pesquisa_binaria(Restaurante** array, int n, char* busca){
   }
   printf("%s", resp ? "SIM\n" : "NAO\n");
 }
+//===============================================
+//exibir pilha montada
+void exibir_pilha(Restaurante** array, int n){
+  char* saida = malloc(500*sizeof(char));
+  for(int i=n-1; i>=0; i--){
+    formatar_restaurante(array[i],saida);
+  }
+  free(saida);
+}
+//pilha sequencial
+typedef struct{
+  Restaurante** array;
+  int n;
+} Pilha;
+//"construtor"
+Pilha* criar_pilha(int tamanho){
+  Pilha* p = malloc(sizeof(Pilha));
+  p->array = malloc(tamanho*sizeof(Restaurante*));
+  p->n = 0;
+  return p;
+}
+//empilha o restaurante recebido
+void empilhar(Pilha* p, Restaurante* restaurante){
+  p->array[p->n++] = restaurante;
+}
+//desempilha o restaurante
+Restaurante* desempilhar(Pilha* p){
+  p->n--;
+  return p->array[p->n];
+}
+
+void manipular(Restaurante** array,int n,Colecao_Restaurantes* c){
+  int num; char op;
+  //le quantidade de operacoes
+  scanf("%d", &num);
+  //cria pilha com tamanho do array+operacoes
+  Pilha* p = criar_pilha(num + n);
+  //empilha na nova pilha os restaurantes dos ids digitados
+  for(int i=0; i<n; i++){
+    empilhar(p, array[i]);
+  }
+  int k=0, id;
+  while(k<num){
+    scanf(" %c", &op);
+    if(op == 'I'){
+      scanf("%d", &id);
+      //pega as informacoes do restaurante do csv
+      Restaurante* r = pesquisarId(c, id);
+      //empilha
+      if(r!=NULL)empilhar(p,r);
+    }else if(op == 'R'){
+      Restaurante* rm = desempilhar(p);
+      printf("(R) %s\n", rm->nome);
+    }
+    k++;
+  }
+  //exibe a pilha pronta
+  exibir_pilha(p->array, p->n);
+  free(p->array);
+  free(p);
+}
+//===============================================
 
 //metodo para liberar memoria
 void liberar_memoria(Colecao_Restaurantes* c) {
@@ -400,6 +462,7 @@ void criar_log(double tempoExecucao){
     fclose(log);
   }
 }
+
 //metodo para printar
 void exibir(Restaurante** array, int n){
   char* saida = malloc(500*sizeof(char));
@@ -420,28 +483,36 @@ int main(){
   clock_t inicio;
   clock_t fim;
   double tempoExecucao;
-  //cria a colecao
+
+  //le o csv e guarda todos os restaurantes na colecao
   Colecao_Restaurantes* colecao = ler_csv();
   int n = colecao->tamanho;
 
-  //cria um array temporario para pesquisar os ids
+  //cria um array temporario com tamanho do csv para pesquisar os ids
   Restaurante** tmp = malloc(n*sizeof(Restaurante*));
   int id=0, i=0;
-  while(scanf("%d", &id) > 0){
+  while(scanf("%d", &id) == 1 && id!=-1){
     Restaurante* r = pesquisarId(colecao, id);
     if(r != NULL){
       tmp[i++] = r;
     }
   }
-  //armazena em um array apenas os ids encontrados
+  //cria o array com os ids digitados
   Restaurante** array = malloc(i*sizeof(Restaurante*));
   for(int j = 0; j < i; j++){
     array[j] = tmp[j];
   }
-  free(tmp);
+
+
   
   //printa os restaurantes correspondentes aos ids lidsos
+  
   //exibir(array,i);
+ 
+  //chama a pilha e inicia a manipulacao da pilha, inserindo e removendo restaurantes
+  manipular(array,i,colecao);
+  
+  //METODOS DE ORDENCAO E PESQUISA COMENTADOS, QUANDO FOR USAR DESCOMENTAE
   
   /*
   //ordenando pelo metodo de selecao
@@ -449,7 +520,8 @@ int main(){
   inicio = clock();
   ordenar_selecao(array,i);
   fim = clock();
-  exibir(array,i);*/
+  exibir(array,i);
+  */
 
   /*
   //pesquisando de forma binaria
@@ -461,7 +533,8 @@ int main(){
     pesquisa_binaria(array,i,busca);
   }
   free(busca);
-  fim = clock();*/
+  fim = clock();
+  */
 
   /*
   //ordenando pelo metodo de quicksort
@@ -469,22 +542,24 @@ int main(){
   inicio=clock();
   quicksort(array,i);
   fim=clock();
-  exibir(array,i);*/
+  exibir(array,i);
+  */
 
-  
+  /*
   //ordenando pelo metodo de countingsort
   comparacoes=0; movimentacoes=0;
   inicio=clock();
   countingsort(array,i);
   fim=clock();
   exibir(array,i);
+  */
 
   tempoExecucao = ((fim-inicio)/(double)CLOCKS_PER_SEC);
-  //criando log
+  //chama o metodo que cria o arquivo log com  as informacoes
   criar_log(tempoExecucao);
 
   //chama metodo para liberar memorira, e liberar memorira de tmp e array
-  //free(tmp);
+  free(tmp);
   free(array);
   liberar_memoria(colecao);
 }
