@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+
+int comparacoes=0;
+int movimentacoes=0;
 
 //"classe" Data
 typedef struct{
@@ -136,9 +140,9 @@ Restaurante* parse_Restaurante(char* s){
   r->cidade = malloc(50*sizeof(char));
 	char tmp_ha[6],tmp_hf[6],tmp_da[11];
   char* tipos = malloc(30*sizeof(char));
-  char preco[5], tmp_aberto[10];
+  char preco[5], tmp_aberto[15];
   //lendo
-	sscanf(s, "%d,%[^,],%[^,],%d,%lf,%[^,],%[^,],%[^-]-%[^,],%[^,], %s",&r->id,r->nome,r->cidade,&r->capacidade,&r->avaliacao,tipos,preco,tmp_ha,tmp_hf,tmp_da,tmp_aberto);
+	sscanf(s, "%d,%[^,],%[^,],%d,%lf,%[^,],%[^,],%[^-]-%[^,],%[^,],%s",&r->id,r->nome,r->cidade,&r->capacidade,&r->avaliacao,tipos,preco,tmp_ha,tmp_hf,tmp_da,tmp_aberto);
 	r->horario_abertura = parse_hora(tmp_ha);
 	r->horario_fechamento = parse_hora(tmp_hf);
 	r->data_abertura = parse_data(tmp_da);
@@ -223,9 +227,11 @@ void ler_csv_colecao(Colecao_Restaurantes* c, char* path){
     printf("erro ao abrir arquivo");
     exit(EXIT_FAILURE);
   }
+  char* linha = malloc(500*sizeof(char));
+  //limpando cabecalho
+  fgets(linha, 500, file);
 
-  char* linha = malloc(150*sizeof(char));
-  while(fgets(linha, 150, file) != NULL){
+  while(fgets(linha, 500, file) != NULL){
     if(linha[0] != '\0' && linha[0] != '\n'){
       Restaurante* r = parse_Restaurante(linha);
       c->restaurantes[c->tamanho++] = r;
@@ -237,8 +243,8 @@ void ler_csv_colecao(Colecao_Restaurantes* c, char* path){
 //le o caminho do arquivo
 Colecao_Restaurantes* ler_csv(){
   Colecao_Restaurantes* c = criar_colecao();
-//  char* caminho = "/tmp/restaurantes.csv";
-  char* caminho = "/home/augusto/restaurantes.csv";
+  char* caminho = "/tmp/restaurantes.csv";
+  //char* caminho = "/home/augusto/restaurantes.csv";
   ler_csv_colecao(c, caminho);
   return c;
 }
@@ -280,51 +286,59 @@ void ordenar_selecao(Restaurante** array, int n){
 
 //pesquisando de forma binaria
 void pesquisa_binaria(Restaurante** array, int n, char* busca){
+  comparacoes=0;
   int resp=0, esq=0, dir=n-1;
 
   while(esq <= dir){
+    comparacoes++;
     int meio = (esq+dir)/2;
     int decisao = strcmp(array[meio]->nome, busca);
+
+    comparacoes++;
     if(decisao == 0){
       resp = 1;
       esq = dir+1;
-    }else if(decisao < 0){
+    }else{
+      comparacoes++;
+      if(decisao < 0){
       esq = meio+1;
     }else{
       dir = meio-1;
+    }
     }
   }
   printf("%s", resp ? "SIM\n" : "NAO\n");
 }
 
-//fazendo a faxina no restaurante
-void liberar_restaurante(Restaurante* r){
-  free(r->nome);
-  free(r->cidade);
-  for(int i=0;i < r->n_tipos_cozinha; i++){
-    free(r->tipos_cozinha[i]);
+void liberar_memoria(Colecao_Restaurantes* c) {
+  for (int i = 0; i < c->tamanho; i++) {
+    free(c->restaurantes[i]->nome);
+    free(c->restaurantes[i]->cidade);
+    free(c->restaurantes[i]->horario_abertura);
+    free(c->restaurantes[i]->horario_fechamento);
+    free(c->restaurantes[i]->data_abertura);
+
+    for (int j = 0; j < c->restaurantes[i]->n_tipos_cozinha; j++) {
+      free(c->restaurantes[i]->tipos_cozinha[j]);
+    }
+    free(c->restaurantes[i]->tipos_cozinha);
+    free(c->restaurantes[i]);
   }
-  free(r->tipos_cozinha);
-  free(r->horario_abertura);
-  free(r->horario_fechamento);
-  free(r->data_abertura);
-  free(r);
-}
-//fazendo a faxina na colecao
-void liberar_colecao(Colecao_Restaurantes* c){
-  for(int i=0; i < c->tamanho; i++){
-    liberar_restaurante(c->restaurantes[i]);
-  }
+  // Libera a estrutura da coleção
   free(c->restaurantes);
   free(c);
 }
 //metodo para controlar o loop "FIM"
 int isFim(char* s){
   int resp = 0;
-  if(s[0] == 'F' && s[1] == 'I' && s[2] == 'M' && s[3] == '\0')resp = 1;
+  if(s[0] == 'F' && s[1] == 'I' && s[2] == 'M')resp = 1;
   return resp;
 }
 int main(){
+  //variaveis para contar tempo de execucao
+  clock_t inicio;
+  clock_t fim;
+  double tempoExecucao;
   //cria a colecao
   Colecao_Restaurantes* colecao = ler_csv();
   int n = colecao->tamanho;
@@ -343,23 +357,39 @@ int main(){
   for(int j = 0; j < i; j++){
     array[j] = tmp[j];
   }
+  
   //printa os restaurantes correspondentes aos ids idsos
   char saida[500];
-  for(int j=0; j<i; j++){
-    //formatar_restaurante(array[j], saida);
-  }
+  /*for(int j=0; j<i; j++){
+    formatar_restaurante(array[j], saida);
+  }*/
+
   //ordenando pelo metodo de selecao
   ordenar_selecao(array,i);
-  for(int j=0; j<i; j++){
-    //formatar_restaurante(array[j],saida);
-  }
-  //pesquisando de forma binaria
-  char busca[40];
-  while(scanf(" %[^\n]", busca) == 1 && isFim(busca) == 0){
+  /*for(int j=0; j<i; j++){
+    formatar_restaurante(array[j],saida);
+  }*/
+
+  //pesquisando de forma binaria e criando log
+  char busca[100];
+  //comeco da execucao
+  inicio = clock();
+  //lendo ate \n \r. programa so funcionava no verde com \r no final
+  while(scanf(" %[^\n\r]", busca) == 1 && isFim(busca) == 0){
     pesquisa_binaria(array,i,busca);
   }
+  //fim da execucao
+  fim = clock();
+  tempoExecucao = ((double)(fim-inicio)/CLOCKS_PER_SEC) * 1000.0;
+  //criando arquivo de log
+  FILE* log_pesquisa = fopen("898723_binaria.txt", "w");
+  if(log_pesquisa != NULL){
+    fprintf(log_pesquisa, "898723\t%d\t%.1f\n", comparacoes, tempoExecucao);
+    fclose(log_pesquisa);
+  }
+
   //chama metodo para liberar e liberar memorira de tmp e array
   free(tmp);
   free(array);
-  liberar_colecao(colecao);
+  liberar_memoria(colecao);
 }
