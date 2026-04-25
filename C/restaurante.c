@@ -243,8 +243,10 @@ void ler_csv_colecao(Colecao_Restaurantes* c, char* path){
 //le o caminho do arquivo
 Colecao_Restaurantes* ler_csv(){
   Colecao_Restaurantes* c = criar_colecao();
-  char* caminho = "/tmp/restaurantes.csv";
-  //char* caminho = "/home/augusto/restaurantes.csv";
+  //char* caminho = "/tmp/restaurantes.csv";
+  
+  //teste com a caminho da minha maquina
+  char* caminho = "/home/augusto/restaurantes.csv";
   ler_csv_colecao(c, caminho);
   return c;
 }
@@ -268,7 +270,13 @@ void swap(Restaurante** array, int i, int j){
 
 //metodo para comparar
 int compare_to(Restaurante* e1, Restaurante* e2){
-  int resp = strcmp(e1->nome, e2->nome);
+  int resp;
+  if(e1->avaliacao < e2->avaliacao)
+    resp=-1;
+  else if(e1->avaliacao > e2->avaliacao)
+    resp=1;
+  else
+  resp = strcmp(e1->nome, e2->nome);
   return resp;
 }
 
@@ -277,21 +285,75 @@ void ordenar_selecao(Restaurante** array, int n){
   for(int i = 0; i < n; i++){
     int menor = i;
     for(int j = i+1; j<n; j++){
+      comparacoes++;
       if(compare_to(array[j], array[menor]) < 0)
         menor = j;
     }
+    movimentacoes+=3;
     swap(array,i,menor);
   }
 }
 
+//ordenando por quicksort
+void quicksort_rec(Restaurante** array, int esq, int dir){
+  int i=esq, j=dir;
+  Restaurante* pivo = array[(dir+esq)/2];
+  while(i<=j){
+    while(compare_to(array[i], pivo) < 0){
+      comparacoes++; i++;
+    }
+    while(compare_to(array[j], pivo) > 0){
+      comparacoes++; j--;
+    }
+    comparacoes++;
+    if(i<=j){
+      swap(array,i,j);
+      movimentacoes+=3;
+      j--; i++;
+    }
+  }
+  if(esq < j) quicksort_rec(array,esq,j);
+  if(i < dir) quicksort_rec(array,i,dir);
+}
+void quicksort(Restaurante** array, int n){
+  quicksort_rec(array,0,n-1);
+}
+
+//ordenando por countingsort
+int getMaior(Restaurante** array, int n){
+  int maior = array[0]->capacidade;
+
+  for(int i=0; i<n; i++){
+    comparacoes++;
+    if(array[i]->capacidade > maior)
+      maior = array[i]->capacidade;
+  }
+  return maior;
+}
+void countingsort(Restaurante** array, int n){
+  int tamCount = getMaior(array,n) + 1;
+  int count[tamCount];
+  Restaurante* ordenado[n];
+
+  for(int i=0; i<tamCount; count[i]=0, i++);
+
+  for(int i=0; i<n; count[array[i]->capacidade]++, i++);
+
+  for(int i=1; i<tamCount; count[i] += count[i-1], i++);
+
+  for(int i = n-1; i >= 0; ordenado[count[array[i]->capacidade]-1] = array[i], count[array[i]->capacidade]--, i--){movimentacoes++;}
+
+  for(int i = 0; i < n; array[i] = ordenado[i], i++){movimentacoes++;}
+  movimentacoes++;
+}
+
 //pesquisando de forma binaria
 void pesquisa_binaria(Restaurante** array, int n, char* busca){
-  comparacoes=0;
   int resp=0, esq=0, dir=n-1;
 
   while(esq <= dir){
-    comparacoes++;
     int meio = (esq+dir)/2;
+    comparacoes++;
     int decisao = strcmp(array[meio]->nome, busca);
 
     comparacoes++;
@@ -310,6 +372,7 @@ void pesquisa_binaria(Restaurante** array, int n, char* busca){
   printf("%s", resp ? "SIM\n" : "NAO\n");
 }
 
+//metodo para liberar memoria
 void liberar_memoria(Colecao_Restaurantes* c) {
   for (int i = 0; i < c->tamanho; i++) {
     free(c->restaurantes[i]->nome);
@@ -328,6 +391,24 @@ void liberar_memoria(Colecao_Restaurantes* c) {
   free(c->restaurantes);
   free(c);
 }
+
+//metodo pra criar o log
+void criar_log(double tempoExecucao){
+  FILE* log = fopen("898723_countingsort.txt", "w");
+  if(log != NULL){
+    fprintf(log, "898723\t%d\t%d\t%lf\n", comparacoes, movimentacoes,tempoExecucao);
+    fclose(log);
+  }
+}
+//metodo para printar
+void exibir(Restaurante** array, int n){
+  char* saida = malloc(500*sizeof(char));
+  for(int i=0; i<n; i++){
+    formatar_restaurante(array[i],saida);
+  }
+  free(saida);
+}
+
 //metodo para controlar o loop "FIM"
 int isFim(char* s){
   int resp = 0;
@@ -357,39 +438,53 @@ int main(){
   for(int j = 0; j < i; j++){
     array[j] = tmp[j];
   }
+  free(tmp);
   
-  //printa os restaurantes correspondentes aos ids idsos
-  char saida[500];
-  /*for(int j=0; j<i; j++){
-    formatar_restaurante(array[j], saida);
-  }*/
-
+  //printa os restaurantes correspondentes aos ids lidsos
+  //exibir(array,i);
+  
+  /*
   //ordenando pelo metodo de selecao
-  ordenar_selecao(array,i);
-  /*for(int j=0; j<i; j++){
-    formatar_restaurante(array[j],saida);
-  }*/
-
-  //pesquisando de forma binaria e criando log
-  char busca[100];
-  //comeco da execucao
+  comparacoes=0; movimentacoes=0;
   inicio = clock();
-  //lendo ate \n \r. programa so funcionava no verde com \r no final
+  ordenar_selecao(array,i);
+  fim = clock();
+  exibir(array,i);*/
+
+  /*
+  //pesquisando de forma binaria
+  char* busca = malloc(100*sizeof(char));
+  inicio = clock();
+  //lendo ate \n \r. programa so rodava 100% no verde com \r no final
+  comparacoes=0;
   while(scanf(" %[^\n\r]", busca) == 1 && isFim(busca) == 0){
     pesquisa_binaria(array,i,busca);
   }
-  //fim da execucao
-  fim = clock();
-  tempoExecucao = ((double)(fim-inicio)/CLOCKS_PER_SEC) * 1000.0;
-  //criando arquivo de log
-  FILE* log_pesquisa = fopen("898723_binaria.txt", "w");
-  if(log_pesquisa != NULL){
-    fprintf(log_pesquisa, "898723\t%d\t%.1f\n", comparacoes, tempoExecucao);
-    fclose(log_pesquisa);
-  }
+  free(busca);
+  fim = clock();*/
 
-  //chama metodo para liberar e liberar memorira de tmp e array
-  free(tmp);
+  /*
+  //ordenando pelo metodo de quicksort
+  comparacoes=0; movimentacoes=0;
+  inicio=clock();
+  quicksort(array,i);
+  fim=clock();
+  exibir(array,i);*/
+
+  
+  //ordenando pelo metodo de countingsort
+  comparacoes=0; movimentacoes=0;
+  inicio=clock();
+  countingsort(array,i);
+  fim=clock();
+  exibir(array,i);
+
+  tempoExecucao = ((fim-inicio)/(double)CLOCKS_PER_SEC);
+  //criando log
+  criar_log(tempoExecucao);
+
+  //chama metodo para liberar memorira, e liberar memorira de tmp e array
+  //free(tmp);
   free(array);
   liberar_memoria(colecao);
 }
