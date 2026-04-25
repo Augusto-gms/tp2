@@ -160,7 +160,7 @@ class Restaurante{
   public static Restaurante parseRestaurante(String s){
     Scanner sc = new Scanner(s);
     // locale para o doube ler . e nao ,
-    //sc.useLocale(Locale.US);
+    sc.useLocale(Locale.US);
     sc.useDelimiter(",");
 
     // lendo id,nome,cidade,capacidade,avaliacao
@@ -266,7 +266,8 @@ class ColecaoRestaurantes{
   public static ColecaoRestaurantes lerCsv() throws Exception{
     ColecaoRestaurantes colecao = new ColecaoRestaurantes();
     //le o arquivo csv no caminho correto
-    colecao.lerCsv("/tmp/restaurantes.csv");
+    //colecao.lerCsv("/tmp/restaurantes.csv");
+    colecao.lerCsv("/home/augusto/tp2/entregas/restaurantes.csv");
     return colecao;
   }
 
@@ -469,22 +470,153 @@ class PesquisaSequencial{
     return resp;
   }
 }
+class Lista{
+  private Restaurante[] array;
+  private int n;
+  //metodo construtor recebendo numero de registros
+  public Lista(int tamanho){
+    array = new Restaurante[tamanho];
+    n = 0;
+  }
+  //metodos de insercao
+  private void inserirInicio(Restaurante restaurante)throws Exception{
+    if(n >= array.length)
+      throw new Exception("erro ao inserir no inicio");
+    for(int  i=n; i>0; i--){
+      array[i] = array[i-1];
+    }
+    array[0] = restaurante;
+    n++;
+  }
+
+  private void inserir(Restaurante restaurante, int pos)throws Exception{
+    if(n >= array.length || pos < 0 || pos > n)
+      throw new Exception("erro ao inserir em qualquer posicao");
+    for(int i=n; i>pos; i--){
+      array[i] = array[i-1];
+    }
+    array[pos] = restaurante;
+    n++;
+  }
+
+  private void inserirFim(Restaurante restaurante)throws Exception{
+    if(n>= array.length)
+      throw new Exception("erro ao inserir no fim");
+    array[n++] = restaurante;
+  }
+
+  //metodos de remocao
+  private Restaurante removerInicio()throws Exception{
+    if(n == 0)
+      throw new Exception("erro ao remover no inicio");
+    Restaurante resp = array[0];
+    n--;
+    for(int i=0; i<n; i++){
+      array[i] = array[i+1];
+    }
+    return resp;
+  }
+
+  private Restaurante removerFim()throws Exception{
+    if(n == 0)
+      throw new Exception("erro ao remover do fim");
+    return array[--n];
+  }
+  
+  private Restaurante remover(int pos)throws Exception{
+    if(n == 0 || pos < 0 || pos > n)
+      throw new Exception("erro ao remover de qualquer posicao");
+    Restaurante resp = array[pos];
+    n--;
+    for(int i=pos; i<n; i++){
+      array[i] = array[i+1];
+    }
+    return resp;
+  }
+
+  public static void manipular(Restaurante[] array,int n,ColecaoRestaurantes c, Scanner sc)throws Exception{ 
+    int num,pos; String op;
+    num = sc.nextInt();
+    Lista lista = new Lista(num+n);
+    //colocando os restaurantes no fim
+    for(int i=0; i<n; i++){
+        lista.inserirFim(array[i]);
+    }
+    int k=0, id;
+    Restaurante rm;
+    //loop principal para ler todos registros
+    while(k<num){
+      op=sc.next();
+      
+      //verifica se a operacao eh de insercao
+      if(op.charAt(0) == 'I'){
+        if(op.charAt(1) == 'I'){
+          id=sc.nextInt();
+          Restaurante r = c.pesquisarId(id);
+          lista.inserirInicio(r);
+        }else if(op.charAt(1) == 'F'){
+          id=sc.nextInt();
+          Restaurante r = c.pesquisarId(id);
+          lista.inserirFim(r);
+        }else{
+          pos=sc.nextInt();
+          id=sc.nextInt();
+          Restaurante r = c.pesquisarId(id);
+          lista.inserir(r,pos);
+        }
+      }else if(op.charAt(0) == 'R'){
+        if(op.charAt(1) == 'I'){
+          rm=lista.removerInicio();
+          System.out.println("(R)" + rm.getNome());
+        }else if(op.charAt(1) == 'F'){
+          rm=lista.removerFim();
+          System.out.println("(R)" + rm.getNome());
+        }else{
+          pos=sc.nextInt();
+          rm=lista.remover(pos);
+          System.out.println("(R)" + rm.getNome());
+        }
+      //se nao for nem I nem R eh operacao invalida
+      }else{
+        System.out.println("operacao invalida");
+      }
+      k++;
+    }
+    lista.exibir();
+  }
+
+  public void exibir(){
+    for(int i=0; i<n; i++){
+      System.out.println(array[i].formatar());
+    }
+  }
+}
+
 public class Main{
   public static int isFim(String s){
     int resp = 0;
     if(s.charAt(0) == 'F' && s.charAt(1) == 'I' && s.charAt(2) == 'M')resp = 1;
     return resp;
   }
+  public static void exibir(Restaurante[] array,int n){
+    for(int i=0; i<n; i++){
+      System.out.println(array[i].formatar());
+    }
+  }
   public static void main(String[] args) throws Exception{
     Scanner sc = new Scanner(System.in);
-    // pesquisando por id
+    //variaveis pra contar tempo e nome do metodo de ordenacao/pesquisaa
+    double inicio, fim;
+    String metodo;
+    //lendo dados do csv
     ColecaoRestaurantes colecao = ColecaoRestaurantes.lerCsv();
     int n = colecao.getTamanho();
-    // criando array
+
+    // criando array temporario para pegar os ids
     Restaurante[] tmp = new Restaurante[n];
     int id = 0, i = 0;
     id = sc.nextInt();
-    while (id >= 0) {
+    while (id != -1) {
       Restaurante r = colecao.pesquisarId(id);
       if(r != null){
         tmp[i++] = r;
@@ -497,43 +629,48 @@ public class Main{
     for(int j = 0; j < i; j++) {
       array[j] = tmp[j];
     }
+    
+    //montando a lista passando array de ids, tamanho, array do csv e scanner(tava dando problema sem passar)
+    //Lista.manipular(array,i,colecao,sc);
 
-    /*
-     * printando os restaurantes correspondentes aos ids digitados
-     * for(int j = 0; j < i; j++){
-     * System.out.println(array[j].formatar());
-     * }*/
-
-    double inicio, fim;
+    
+    
+    //printando os restaurantes correspondentes aos ids digitados
+    //exibir(array,i);
+    
+    //criando objeto de ordenacao
     Ordenacao ordenar = new Ordenacao();
     inicio = new Date().getTime();// inicia a cronometrar
 
-    //ordenar.insercao(array, i);
-    //ordenar.mergesort(array);
-    ordenar.heapsort(array);
-
+    //METODOS DE ORDENACAO, DESCOMENTAR PRA USAR
+    //ordenar.insercao(array, i); metodo="insercao";
+    //ordenar.mergesort(array); metodo="mergesort";
+    ordenar.heapsort(array); metodo="heapsort";
+  
     fim = new Date().getTime();// termina de cronometrar
-    // pega o resultado em ms
     double tempoExecucao = fim - inicio;
     //printa o array ordenado
-    for(int j = 0; j < i; j++) {
-      System.out.println(array[j].formatar());
-    }
-    FileWriter fw = new FileWriter("898723_heapsort.txt");
+    exibir(array,i);
+    
+    //cria log de acordo com os dados do metodo de ordenacao
+    FileWriter fw = new FileWriter("898723_" + metodo + ".txt");
     fw.write("898723" + "\t" + Ordenacao.comparacoes + "\t" + Ordenacao.movimentacoes + "\t" + tempoExecucao);
     fw.close();
 
+
+
+    /*
     //pesquisa sequencial
     PesquisaSequencial pesquisa = new PesquisaSequencial();
     //limpando buffer
     if(sc.hasNextLine())sc.nextLine();
-    //lendo nome a ser buscado
     String busca = sc.nextLine();
     while(isFim(busca) == 0){
-      pesquisa.pesquisar(array,i,busca);
+      //pesquisa.pesquisar(array,i,busca);
       busca = sc.nextLine();
     }
-    
+    */
+
     FileWriter fm = new FileWriter("898723_sequencial.txt");
     fm.write("898723" + "\t" + PesquisaSequencial.comparacoes + "\t");
     fm.close();
