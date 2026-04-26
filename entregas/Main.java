@@ -266,8 +266,8 @@ class ColecaoRestaurantes{
   public static ColecaoRestaurantes lerCsv() throws Exception{
     ColecaoRestaurantes colecao = new ColecaoRestaurantes();
     //le o arquivo csv no caminho correto
-    //colecao.lerCsv("/tmp/restaurantes.csv");
-    colecao.lerCsv("/home/augusto/tp2/entregas/restaurantes.csv");
+    colecao.lerCsv("/tmp/restaurantes.csv");
+    //colecao.lerCsv("/home/augusto/tp2/entregas/restaurantes.csv");
     return colecao;
   }
 
@@ -470,6 +470,8 @@ class PesquisaSequencial{
     return resp;
   }
 }
+
+//inicio da classe Lista
 class Lista{
   private Restaurante[] array;
   private int n;
@@ -479,6 +481,8 @@ class Lista{
     n = 0;
   }
   //metodos de insercao
+
+  //insere no comeco da Lista
   private void inserirInicio(Restaurante restaurante)throws Exception{
     if(n >= array.length)
       throw new Exception("erro ao inserir no inicio");
@@ -489,6 +493,7 @@ class Lista{
     n++;
   }
 
+  //insere em qualquer posicao da lista
   private void inserir(Restaurante restaurante, int pos)throws Exception{
     if(n >= array.length || pos < 0 || pos > n)
       throw new Exception("erro ao inserir em qualquer posicao");
@@ -499,6 +504,7 @@ class Lista{
     n++;
   }
 
+  //insere no final da lista
   private void inserirFim(Restaurante restaurante)throws Exception{
     if(n>= array.length)
       throw new Exception("erro ao inserir no fim");
@@ -506,6 +512,8 @@ class Lista{
   }
 
   //metodos de remocao
+  
+  //remove do inicio da lista
   private Restaurante removerInicio()throws Exception{
     if(n == 0)
       throw new Exception("erro ao remover no inicio");
@@ -517,12 +525,14 @@ class Lista{
     return resp;
   }
 
+  //remove do fim da lista
   private Restaurante removerFim()throws Exception{
     if(n == 0)
       throw new Exception("erro ao remover do fim");
     return array[--n];
   }
   
+  //remove de qualquer posicvao da lista
   private Restaurante remover(int pos)throws Exception{
     if(n == 0 || pos < 0 || pos > n)
       throw new Exception("erro ao remover de qualquer posicao");
@@ -534,7 +544,8 @@ class Lista{
     return resp;
   }
 
-  public static void manipular(Restaurante[] array,int n,ColecaoRestaurantes c, Scanner sc)throws Exception{ 
+  //manipula a lista, realizando as operacoes conforme a as letras digitadas
+  public static void manipularLista(Restaurante[] array,int n,ColecaoRestaurantes c, Scanner sc)throws Exception{ 
     int num,pos; String op;
     num = sc.nextInt();
     Lista lista = new Lista(num+n);
@@ -591,6 +602,81 @@ class Lista{
     }
   }
 }
+//fim da classe Lista
+
+//inicio da fila circular
+class FilaCircular{
+  private Restaurante[] array;
+  private int primeiro, ultimo;
+  private int tamanho=6;
+  public FilaCircular(){
+    array = new Restaurante[tamanho];
+    primeiro=ultimo=0;
+  }
+
+  //metodo de insercao
+  private void inserir(Restaurante r)throws Exception{
+    if(((ultimo+1) % array.length) == primeiro){
+      Restaurante rm = remover();
+      System.out.println("(R)" + rm.getNome());
+    }
+    array[ultimo] = r;
+    ultimo = (ultimo+1)%array.length;
+    //pegando a media dos anos
+    int soma=0, cont=0;
+    for(int i = primeiro; i != ultimo; i = (i+1)%array.length){
+      soma+=array[i].getDataAbertura().getAno();
+      cont++;
+    }
+    int media = (soma+cont/2)/cont;
+    System.out.println("(I)"+ media);
+
+  }
+
+  //metodo de remocao
+  private Restaurante remover()throws Exception{
+    if(primeiro == ultimo){
+      throw new Exception("nao foi possivle remover");
+    }
+    
+    Restaurante resp = array[primeiro];
+    primeiro = (primeiro+1) % array.length;
+    return resp;
+  }
+
+  //metodo para manipular a fila de acordo com as entradas
+  public void manipularFila(Restaurante[] arrayIds, int n, ColecaoRestaurantes c,Scanner sc)throws Exception{
+    FilaCircular fila = new FilaCircular();
+    int num = sc.nextInt();
+    
+    //enfileirando os restaurantes que vieram primeiro
+    for(int i=0; i<n; i++){
+      fila.inserir(arrayIds[i]);
+    }
+    
+    int j=0,id;
+    while(j<num){
+      String op = sc.next();
+      if(op.charAt(0) == 'I'){
+        id=sc.nextInt();
+        Restaurante r = c.pesquisarId(id);
+        if(r!=null)fila.inserir(r);
+      }else if(op.charAt(0) == 'R'){
+        Restaurante rm = fila.remover();
+        System.out.println("(R)" + rm.getNome());
+      }
+      j++;
+    }
+    fila.exibir();
+  }
+
+  //metodo para exibir
+  public void exibir(){
+    for(int i=primeiro; i!=ultimo; i = (i+1)%array.length){
+      System.out.println(array[i].formatar());
+    }
+  }
+}
 
 public class Main{
   public static int isFim(String s){
@@ -607,7 +693,7 @@ public class Main{
     Scanner sc = new Scanner(System.in);
     //variaveis pra contar tempo e nome do metodo de ordenacao/pesquisaa
     double inicio, fim;
-    String metodo;
+    String metodo="";
     //lendo dados do csv
     ColecaoRestaurantes colecao = ColecaoRestaurantes.lerCsv();
     int n = colecao.getTamanho();
@@ -631,10 +717,12 @@ public class Main{
     }
     
     //montando a lista passando array de ids, tamanho, array do csv e scanner(tava dando problema sem passar)
-    //Lista.manipular(array,i,colecao,sc);
+    //Lista.manipularLista(array,i,colecao,sc);
 
-    
-    
+    //montando a fila circular passando array de ids, tamanho, array do csv e scanner(tava dando problema sem passer)
+    FilaCircular fila = new FilaCircular();
+    fila.manipularFila(array,i,colecao,sc);
+
     //printando os restaurantes correspondentes aos ids digitados
     //exibir(array,i);
     
@@ -645,12 +733,12 @@ public class Main{
     //METODOS DE ORDENACAO, DESCOMENTAR PRA USAR
     //ordenar.insercao(array, i); metodo="insercao";
     //ordenar.mergesort(array); metodo="mergesort";
-    ordenar.heapsort(array); metodo="heapsort";
+    //ordenar.heapsort(array); metodo="heapsort";
   
     fim = new Date().getTime();// termina de cronometrar
     double tempoExecucao = fim - inicio;
     //printa o array ordenado
-    exibir(array,i);
+    //exibir(array,i);
     
     //cria log de acordo com os dados do metodo de ordenacao
     FileWriter fw = new FileWriter("898723_" + metodo + ".txt");
