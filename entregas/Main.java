@@ -160,7 +160,7 @@ class Restaurante{
   public static Restaurante parseRestaurante(String s){
     Scanner sc = new Scanner(s);
     // locale para o doube ler . e nao ,
-    sc.useLocale(Locale.US);
+    //sc.useLocale(Locale.US);
     sc.useDelimiter(",");
 
     // lendo id,nome,cidade,capacidade,avaliacao
@@ -222,7 +222,7 @@ class Restaurante{
       preco += "$";
     }
     // printando string formatada
-    return String.format(Locale.US, "[%d ## %s ## %s ## %d ## %.1f ## [%s] ## %s ## %s-%s ## %s ## %b]", id, nome,
+    return String.format("[%d ## %s ## %s ## %d ## %.1f ## [%s] ## %s ## %s-%s ## %s ## %b]", id, nome,
         cidade, capacidade, avaliacao, tipos, preco, horarioAbertura.formatar(), horarioFechamento.formatar(),
         dataAbertura.formatar(), aberto);
   }
@@ -267,6 +267,8 @@ class ColecaoRestaurantes{
     ColecaoRestaurantes colecao = new ColecaoRestaurantes();
     //le o arquivo csv no caminho correto
     colecao.lerCsv("/tmp/restaurantes.csv");
+    
+    //testando na minha maquina
     //colecao.lerCsv("/home/augusto/tp2/entregas/restaurantes.csv");
     return colecao;
   }
@@ -322,6 +324,7 @@ class Ordenacao{
 
   // metodo para comparar
   private int compareTo(Restaurante e1, Restaurante e2){
+    //comparacao usada pelo heapsort
     int resp = e1.getDataAbertura().getAno() - e2.getDataAbertura().getAno();
     if(resp == 0){
       resp = e1.getDataAbertura().getMes() - e2.getDataAbertura().getMes();
@@ -332,6 +335,17 @@ class Ordenacao{
          }
       }
     }
+
+    //usado pelo insercao
+    //int resp = e1.getCidade().compareTo(e2.getCidade());
+
+    /*
+    //usado pelo mergesort
+    int resp = e1.getCidade().compareTo(e2.getCidade());
+    if(resp == 0){
+      resp = e1.getNome().compareTo(e2.getNome());
+    }
+    */
     return resp;
   }
   // metodo de ordenacao por mergesort
@@ -451,6 +465,7 @@ class Ordenacao{
   }
 }
 
+//pesquisando de forma sequencial
 class PesquisaSequencial{
   public static int comparacoes;
   public void pesquisar(Restaurante[] array, int n, String busca){
@@ -715,16 +730,17 @@ public class Main{
     for(int j = 0; j < i; j++) {
       array[j] = tmp[j];
     }
+    //printando o array com os ids lidos
+    //exibir(array,i);
     
     //montando a lista passando array de ids, tamanho, array do csv e scanner(tava dando problema sem passar)
     //Lista.manipularLista(array,i,colecao,sc);
 
+    
     //montando a fila circular passando array de ids, tamanho, array do csv e scanner(tava dando problema sem passer)
     FilaCircular fila = new FilaCircular();
     fila.manipularFila(array,i,colecao,sc);
-
-    //printando os restaurantes correspondentes aos ids digitados
-    //exibir(array,i);
+    
     
     //criando objeto de ordenacao
     Ordenacao ordenar = new Ordenacao();
@@ -740,11 +756,12 @@ public class Main{
     //printa o array ordenado
     //exibir(array,i);
     
+    /*
     //cria log de acordo com os dados do metodo de ordenacao
     FileWriter fw = new FileWriter("898723_" + metodo + ".txt");
     fw.write("898723" + "\t" + Ordenacao.comparacoes + "\t" + Ordenacao.movimentacoes + "\t" + tempoExecucao);
     fw.close();
-
+    */
 
 
     /*
@@ -754,14 +771,16 @@ public class Main{
     if(sc.hasNextLine())sc.nextLine();
     String busca = sc.nextLine();
     while(isFim(busca) == 0){
-      //pesquisa.pesquisar(array,i,busca);
+      pesquisa.pesquisar(array,i,busca);
       busca = sc.nextLine();
     }
     */
 
+    /*
     FileWriter fm = new FileWriter("898723_sequencial.txt");
     fm.write("898723" + "\t" + PesquisaSequencial.comparacoes + "\t");
     fm.close();
+    */
     sc.close();
   }
 }
